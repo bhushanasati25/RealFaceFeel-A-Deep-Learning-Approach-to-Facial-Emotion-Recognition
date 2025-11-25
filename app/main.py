@@ -339,8 +339,8 @@ with t3:
         <div class="doc-section">
             <div class="doc-title">🔮 5. Performance Expectations</div>
             <div class="doc-text">
-            • <b>Baseline CNN:</b> Expected ~60–65% accuracy.<br>
-            • <b>Target Accuracy:</b> Aiming for <b>70–73%</b> with Transfer Learning & Augmentation.<br>
+            • <b>Baseline CNN:</b> Expected ~70–75% accuracy.<br>
+            • <b>Target Accuracy:</b> Aiming for <b>85–90%</b> with Transfer Learning & Augmentation.<br>
             • <b>Challenges:</b> Performance bounded by label noise and dataset difficulty (occlusions/illumination).
             </div>
         </div>
