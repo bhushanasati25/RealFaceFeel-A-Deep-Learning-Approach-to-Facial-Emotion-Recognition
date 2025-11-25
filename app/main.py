@@ -174,7 +174,7 @@ with st.sidebar:
         st.error("MODEL OFFLINE")
 
     st.markdown("---")
-    st.caption("CS583 Final Project | RealFaceFeel: A Deep Learning Approach to Facial Emotion Recognition")
+    st.caption("CS583 Final Project | RealFaceFeel v1.0")
 
 # ========================================================
 # 5. MAIN CONTENT
@@ -185,7 +185,7 @@ st.markdown("""
 <div class="project-header">
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
-            <h1 style="margin: 0; font-size: 2.5rem;">RealFaceFeel: A Deep Learning Approach to Facial Emotion Recognition</h1>
+            <h1 style="margin: 0; font-size: 2.5rem;">RealFaceFeel</h1>
             <p style="color: #94a3b8; margin: 5px 0 0 0; font-size: 1.1rem;">
                 A Deep Learning Approach to Facial Emotion Recognition
             </p>
@@ -279,17 +279,16 @@ with t1:
 # --- TAB 2: LIVE ---
 with t2:
     st.markdown("### Real-Time Inference")
+    st.markdown("The system will generalize to real-world webcam images via the Streamlit interface.")
     cam = st.camera_input("Capture", label_visibility="collapsed")
     if cam:
         bytes_data = cam.getvalue()
         img = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
         process_and_render(img)
 
-# --- TAB 3: PROJECT DETAILS (Updated) ---
+# --- TAB 3: PROJECT DETAILS (Matched to Your Screenshot) ---
 with t3:
-    st.markdown("### 📄 Project Specifications")
-    st.markdown("Technical details regarding the architecture, dataset, and evaluation metrics.")
-    st.markdown("---")
+    st.markdown("<br>", unsafe_allow_html=True)
     
     col_a, col_b = st.columns(2)
     
@@ -315,21 +314,19 @@ with t3:
         </div>
         """, unsafe_allow_html=True)
         
-        # 3. Models Tried
+        # 3. Model Experiments
         st.markdown("""
         <div class="doc-section">
             <div class="doc-title">🧠 3. Model Experiments</div>
             <div class="doc-text">
             We experimented with the following architectures:
-            <ul>
-                <li><b>Baseline CNN:</b> Custom CNN trained from scratch (48x48 input).</li>
-                <li><b>Transfer Learning:</b> ResNet-50 & VGG16 fine-tuned on FER2013.</li>
-                <li><b>Dlib + MLP:</b> 68-point landmark extraction.</li>
-                <li><b>Transformers:</b> Evaluation of ViT and Swin Transformers.</li>
-            </ul>
-            <br>
-            <span class="tech-tag">Deep CNN</span>
-            <span class="tech-tag">Transfer Learning</span>
+            <br><br>
+            • <b>Baseline CNN:</b> Custom CNN trained from scratch (48x48 input).<br>
+            • <b>Transfer Learning:</b> ResNet-50 & VGG16 fine-tuned on FER2013.<br>
+            • <b>Dlib + MLP:</b> 68-point landmark extraction.<br>
+            • <b>Transformers:</b> Evaluation of ViT and Swin Transformers.
+            <br><br>
+            <span class="tech-tag">Deep CNN</span> <span class="tech-tag">Transfer Learning</span>
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -339,15 +336,15 @@ with t3:
         <div class="doc-section">
             <div class="doc-title">🔮 5. Performance Expectations</div>
             <div class="doc-text">
-            • <b>Baseline CNN:</b> Expected ~60–65% accuracy.<br>
-            • <b>Target Accuracy:</b> Aiming for <b>70–73%</b> with Transfer Learning & Augmentation.<br>
+            • <b>Baseline CNN:</b> Expected ~60-65% accuracy.<br>
+            • <b>Target Accuracy:</b> Aiming for <b>70-73%</b> with Transfer Learning & Augmentation.<br>
             • <b>Challenges:</b> Performance bounded by label noise and dataset difficulty (occlusions/illumination).
             </div>
         </div>
         """, unsafe_allow_html=True)
 
     with col_b:
-        # 2. Dataset Info
+        # 2. Dataset
         st.markdown("""
         <div class="doc-section">
             <div class="doc-title">💾 2. Dataset: FER2013</div>
@@ -373,12 +370,11 @@ with t3:
             <div class="doc-title">📈 4. Evaluation Metrics</div>
             <div class="doc-text">
             Performance is measured using:
-            <ul>
-                <li><b>Accuracy:</b> Standard metric on FER2013 test set.</li>
-                <li><b>Macro F1-Score:</b> To account for class imbalance.</li>
-                <li><b>Confusion Matrix:</b> Identify inter-class misclassifications (e.g., Fear vs Surprise).</li>
-                <li><b>Precision/Recall:</b> Granular per-class insight.</li>
-            </ul>
+            <br><br>
+            • <b>Accuracy:</b> Standard metric on FER2013 test set.<br>
+            • <b>Macro F1-Score:</b> To account for class imbalance.<br>
+            • <b>Confusion Matrix:</b> Identify inter-class misclassifications (e.g., Fear vs Surprise).<br>
+            • <b>Precision/Recall:</b> Granular per-class insight.
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -389,12 +385,11 @@ with t3:
             <div class="doc-title">🤖 6. AI as a Teammate</div>
             <div class="doc-text">
             We utilized AI tools throughout the project lifecycle:
-            <ul>
-                <li><b>Preprocessing:</b> Dlib/MediaPipe code generation.</li>
-                <li><b>Modeling:</b> PyTorch/TensorFlow architectural support.</li>
-                <li><b>Debugging:</b> AI assistants for prototyping.</li>
-                <li><b>Deployment:</b> Streamlit integration support.</li>
-            </ul>
+            <br><br>
+            • <b>Preprocessing:</b> Dlib/MediaPipe code generation.<br>
+            • <b>Modeling:</b> PyTorch/TensorFlow architectural support.<br>
+            • <b>Debugging:</b> AI assistants for prototyping.<br>
+            • <b>Deployment:</b> Streamlit integration support.
             </div>
         </div>
         """, unsafe_allow_html=True)
