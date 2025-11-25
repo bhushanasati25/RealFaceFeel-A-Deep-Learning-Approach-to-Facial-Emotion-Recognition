@@ -279,14 +279,13 @@ with t1:
 # --- TAB 2: LIVE ---
 with t2:
     st.markdown("### Real-Time Inference")
-    st.markdown("The system will generalize to real-world webcam images via the Streamlit interface.")
     cam = st.camera_input("Capture", label_visibility="collapsed")
     if cam:
         bytes_data = cam.getvalue()
         img = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
         process_and_render(img)
 
-# --- TAB 3: PROJECT DETAILS (Matched to Your Screenshot) ---
+# --- TAB 3: PROJECT DETAILS (Updated per screenshot) ---
 with t3:
     st.markdown("<br>", unsafe_allow_html=True)
     
@@ -344,7 +343,7 @@ with t3:
         """, unsafe_allow_html=True)
 
     with col_b:
-        # 2. Dataset
+        # 2. Dataset Info
         st.markdown("""
         <div class="doc-section">
             <div class="doc-title">💾 2. Dataset: FER2013</div>
