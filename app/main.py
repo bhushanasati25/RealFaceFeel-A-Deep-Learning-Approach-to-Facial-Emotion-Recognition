@@ -5,10 +5,27 @@ import tensorflow as tf
 from tensorflow.keras.models import load_model
 import sys
 import os
+import traceback
 
-# Add project root to system path
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-from src.config import MODEL_PATH, HAAR_PATH, CLASSES, IMG_SIZE
+# Add project root to system path (guard if __file__ isn't available)
+try:
+    ROOT = os.path.join(os.path.dirname(__file__), "..")
+    sys.path.append(ROOT)
+except Exception:
+    # Running in an environment without __file__ (e.g., notebook); do nothing
+    pass
+
+# Import config (wrap in try/except for clearer error messages)
+try:
+    from src.config import MODEL_PATH, HAAR_PATH, CLASSES, IMG_SIZE
+except Exception as e:
+    st.warning("Could not import `src.config`. Make sure src/config.py exists and defines MODEL_PATH, HAAR_PATH, CLASSES, IMG_SIZE.")
+    st.write("Import error:", e)
+    # Provide sensible defaults so the app still loads for UI/debugging:
+    MODEL_PATH = "models/emotion_model.keras"
+    HAAR_PATH = "models/haarcascade_frontalface_default.xml"
+    CLASSES = ["Angry", "Disgust", "Fear", "Happy", "Sad", "Surprise", "Neutral"]
+    IMG_SIZE = (48, 48)
 
 # ========================================================
 # 1. PAGE CONFIGURATION
@@ -21,7 +38,7 @@ st.set_page_config(
 )
 
 # ========================================================
-# 2. METALLIC DARK THEME CSS
+# 2. METALLIC DARK THEME CSS (unchanged)
 # ========================================================
 def load_custom_css():
     st.markdown("""
@@ -32,26 +49,23 @@ def load_custom_css():
             --bg-dark: #09090b;
             --bg-card: #18181b;
             --border-color: #27272a;
-            --accent-primary: #3b82f6; /* Blue-500 */
+            --accent-primary: #3b82f6;
             --accent-glow: rgba(59, 130, 246, 0.5);
             --text-primary: #f4f4f5;
             --text-secondary: #a1a1aa;
         }
 
-        /* Main Container */
         .stApp {
             background-color: var(--bg-dark);
             font-family: 'Inter', sans-serif;
         }
 
-        /* Headers */
         h1, h2, h3 {
             color: var(--text-primary) !important;
             font-weight: 800;
             letter-spacing: -0.025em;
         }
 
-        /* Metallic Header Card */
         .project-header {
             background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
             border: 1px solid var(--border-color);
@@ -62,7 +76,7 @@ def load_custom_css():
             position: relative;
             overflow: hidden;
         }
-        
+
         .project-header::before {
             content: '';
             position: absolute;
@@ -70,13 +84,11 @@ def load_custom_css():
             background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
         }
 
-        /* Sidebar Styling */
         [data-testid="stSidebar"] {
             background-color: #0c0c0e;
             border-right: 1px solid var(--border-color);
         }
 
-        /* Documentation Cards (New Tab Style) */
         .doc-section {
             background: #18181b;
             border: 1px solid #27272a;
@@ -101,8 +113,7 @@ def load_custom_css():
             line-height: 1.6;
             font-size: 0.9rem;
         }
-        
-        /* Model Tags */
+
         .tech-tag {
             display: inline-block;
             padding: 2px 8px;
@@ -116,15 +127,13 @@ def load_custom_css():
             margin-bottom: 4px;
         }
 
-        /* Result Cards */
         .result-panel {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 1.5rem;
         }
-        
-        /* Custom Button */
+
         .stButton>button {
             background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%);
             border: none;
@@ -142,28 +151,49 @@ def load_custom_css():
 load_custom_css()
 
 # ========================================================
-# 3. RESOURCE LOADING
+# 3. RESOURCE LOADING (safer)
 # ========================================================
 @st.cache_resource
-def load_resources():
-    if not os.path.exists(MODEL_PATH):
-        return None, None
-    try:
-        model = load_model(MODEL_PATH)
-        face_cascade = cv2.CascadeClassifier(HAAR_PATH)
-        return model, face_cascade
-    except:
-        return None, None
+def load_resources(model_path, haar_path):
+    """Load Keras model and Haar cascade. Return (model, face_cascade, load_errors)"""
+    load_errors = []
+    model = None
+    face_cascade = None
 
-model, face_cascade = load_resources()
+    # Load model
+    if not os.path.exists(model_path):
+        load_errors.append(f"Model file not found at: {model_path}")
+    else:
+        try:
+            model = load_model(model_path)
+        except Exception as e:
+            load_errors.append(f"Failed to load model: {e}")
+
+    # Load haar cascade
+    if not os.path.exists(haar_path):
+        load_errors.append(f"Haar cascade not found at: {haar_path}")
+    else:
+        try:
+            face_cascade = cv2.CascadeClassifier(haar_path)
+            # verify it loaded
+            if face_cascade.empty():
+                load_errors.append("CascadeClassifier loaded but is empty - invalid xml or path.")
+        except Exception as e:
+            load_errors.append(f"Failed to load Haar cascade: {e}")
+
+    return model, face_cascade, load_errors
+
+model, face_cascade, load_errors = load_resources(MODEL_PATH, HAAR_PATH)
 
 # ========================================================
 # 4. SIDEBAR (Minimal Status)
 # ========================================================
 with st.sidebar:
     st.markdown("### 🧬 SYSTEM STATUS")
-    
-    if model:
+    if load_errors:
+        for err in load_errors:
+            st.error(err)
+    if model is not None and face_cascade is not None and not load_errors:
         st.markdown("""
         <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid #059669; color: #34d399; padding: 10px; border-radius: 6px; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 8px;">
             <span style="height: 8px; width: 8px; background: #34d399; border-radius: 50%; display: inline-block;"></span>
@@ -171,7 +201,7 @@ with st.sidebar:
         </div>
         """, unsafe_allow_html=True)
     else:
-        st.error("MODEL OFFLINE")
+        st.warning("Model or Haar cascade is not fully loaded. Some features will be disabled.")
 
     st.markdown("---")
     st.caption("CS583 Final Project | RealFaceFeel: A Deep Learning Approach to Facial Emotion Recognition")
@@ -179,8 +209,6 @@ with st.sidebar:
 # ========================================================
 # 5. MAIN CONTENT
 # ========================================================
-
-# PROJECT HEADER
 st.markdown("""
 <div class="project-header">
     <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -197,51 +225,129 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-if not model:
-    st.warning("⚠️ CRITICAL: Model file missing. Upload `emotion_model.keras` to `models/` directory.")
-    st.stop()
+if model is None or face_cascade is None:
+    st.warning("⚠️ CRITICAL: Model or face detector missing. Upload model and Haar cascade and restart the app.")
+    # We don't `st.stop()` so the UI still loads for debugging. In production you may want to stop.
+    # st.stop()
 
 # --- TABS CONFIGURATION ---
 t1, t2, t3 = st.tabs(["📤  FILE UPLOAD", "📷  WEBCAM INFERENCE", "📘  PROJECT DETAILS"])
 
+def safe_resize(img, target_size):
+    """Resize image while guarding against invalid target_size."""
+    try:
+        return cv2.resize(img, target_size)
+    except Exception:
+        # fallback: use cv2.INTER_AREA and convert to correct dtype
+        h, w = target_size
+        return cv2.resize(img, (w, h), interpolation=cv2.INTER_AREA)
+
 def process_and_render(image_in):
+    """Run face detection, inference and render UI."""
     c_img, c_data = st.columns([1.5, 1])
 
     # Preprocessing
-    gray = cv2.cvtColor(image_in, cv2.COLOR_BGR2GRAY)
-    faces = face_cascade.detectMultiScale(gray, 1.1, 5, minSize=(30, 30))
-    
-    display_img = image_in.copy()
-    
-    if len(faces) == 0:
-        st.info("No biometric data detected. Please improve lighting.")
-        with c_img:
-            st.image(image_in, channels="BGR", use_container_width=True)
+    try:
+        gray = cv2.cvtColor(image_in, cv2.COLOR_BGR2GRAY)
+    except Exception:
+        st.error("Input image must be BGR color np.array.")
         return
 
-    # Process Largest Face
+    # detect faces (guard if cascade not loaded)
+    if face_cascade is None:
+        st.error("Face cascade not loaded. Cannot run detection.")
+        with c_img:
+            st.image(image_in, channels="BGR", use_column_width=True)
+        return
+
+    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+
+    display_img = image_in.copy()
+
+    if len(faces) == 0:
+        st.info("No face detected. Please improve lighting or try a different image.")
+        with c_img:
+            st.image(image_in, channels="BGR", use_column_width=True)
+        return
+
+    # Process largest face
     face = max(faces, key=lambda r: r[2] * r[3])
     x, y, w, h = face
-    
-    # UI: Bounding Box
-    cv2.rectangle(display_img, (x, y), (x+w, y+h), (59, 130, 246), 2)
-    
+
+    # sanity check for box size
+    if w <= 2 or h <= 2:
+        st.warning("Detected face bounding box too small for reliable inference.")
+        with c_img:
+            st.image(display_img, channels="BGR", use_column_width=True)
+        return
+
+    # UI: Bounding Box & label space
+    cv2.rectangle(display_img, (x, y), (x + w, y + h), (59, 130, 246), 2)
+
+    # Extract ROI / preprocess for model
+    try:
+        roi = gray[y:y + h, x:x + w]
+        # ensure ROI size not zero
+        if roi.size == 0:
+            st.error("Empty ROI — face coordinates invalid.")
+            with c_img:
+                st.image(display_img, channels="BGR", use_column_width=True)
+            return
+
+        roi_resized = safe_resize(roi, IMG_SIZE).astype("float32") / 255.0
+
+        # If IMG_SIZE expected by model is (224,224) and grayscale input is single channel,
+        # some models expect 3 channels. We'll stack if needed.
+        if roi_resized.ndim == 2:
+            roi_resized = np.expand_dims(roi_resized, axis=-1)  # H,W,1
+
+        # If model expects 3 channels but we have 1:
+        if model is not None:
+            # Model input shape inference
+            try:
+                model_input_shape = model.input_shape  # e.g. (None, H, W, C)
+                # detect channel dim
+                if len(model_input_shape) == 4:
+                    expected_channels = model_input_shape[-1]
+                    if expected_channels == 3 and roi_resized.shape[-1] == 1:
+                        roi_resized = np.repeat(roi_resized, 3, axis=-1)
+            except Exception:
+                # ignore and continue
+                pass
+
+        roi_batch = np.expand_dims(roi_resized, axis=0)  # 1,H,W,C
+
+    except Exception as e:
+        st.error("Error preprocessing ROI: " + str(e))
+        traceback.print_exc()
+        return
+
     # Inference
-    roi = gray[y:y+h, x:x+w]
-    roi = cv2.resize(roi, IMG_SIZE).astype("float") / 255.0
-    roi = np.expand_dims(np.expand_dims(roi, axis=-1), axis=0)
-    
-    preds = model.predict(roi, verbose=0)[0]
-    idx = np.argmax(preds)
-    label = CLASSES[idx]
-    conf = preds[idx]
+    if model is None:
+        st.error("Model not loaded; cannot perform inference.")
+        with c_img:
+            st.image(display_img, channels="BGR", use_column_width=True)
+        return
+
+    try:
+        preds = model.predict(roi_batch, verbose=0)[0]
+    except Exception as e:
+        st.error(f"Model prediction failed: {e}")
+        traceback.print_exc()
+        with c_img:
+            st.image(display_img, channels="BGR", use_column_width=True)
+        return
+
+    idx = int(np.argmax(preds))
+    label = CLASSES[idx] if idx < len(CLASSES) else f"cls_{idx}"
+    conf = float(preds[idx])
 
     # UI: Label
-    cv2.putText(display_img, f"{label} {conf*100:.0f}%", (x, y-10), 
+    cv2.putText(display_img, f"{label} {conf*100:.0f}%", (x, max(y - 8, 10)),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.7, (59, 130, 246), 2)
-    
+
     with c_img:
-        st.image(display_img, channels="BGR", use_container_width=True)
+        st.image(display_img, channels="BGR", use_column_width=True)
 
     # UI: Data Panel
     with c_data:
@@ -254,27 +360,31 @@ def process_and_render(image_in):
             </div>
         </div>
         """, unsafe_allow_html=True)
-        
+
         st.markdown("<br>", unsafe_allow_html=True)
         st.markdown("#### 📊 Confidence Distribution")
-        
+
         indices = np.argsort(preds)[::-1]
         for i in indices[:5]:
-            val = preds[i]
+            val = float(preds[i])
             if val > 0.01:
                 col_txt, col_bar = st.columns([1, 2])
                 with col_txt:
                     st.write(f"{CLASSES[i]}")
                 with col_bar:
-                    st.progress(float(val))
+                    # `st.progress` expects 0.0-1.0
+                    st.progress(min(max(val, 0.0), 1.0))
 
 # --- TAB 1: UPLOAD ---
 with t1:
     f = st.file_uploader("Select Image", type=['jpg', 'png', 'jpeg'], label_visibility="collapsed")
     if f:
         file_bytes = np.asarray(bytearray(f.read()), dtype=np.uint8)
-        img = cv2.imdecode(file_bytes, 1)
-        process_and_render(img)
+        img = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
+        if img is None:
+            st.error("Failed to decode uploaded image. Please try another file.")
+        else:
+            process_and_render(img)
 
 # --- TAB 2: LIVE ---
 with t2:
@@ -283,7 +393,10 @@ with t2:
     if cam:
         bytes_data = cam.getvalue()
         img = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
-        process_and_render(img)
+        if img is None:
+            st.error("Failed to decode camera capture.")
+        else:
+            process_and_render(img)
 
 # --- TAB 3: PROJECT DETAILS (Updated) ---
 with t3:
@@ -291,22 +404,19 @@ with t3:
     st.markdown("Technical details regarding the architecture, dataset, and evaluation metrics.")
     st.markdown("---")
 
-    # Reference image (local)
-    st.markdown(
-        f"""
-        <div style="margin-bottom: 1rem;">
-            <img src="/mnt/data/c12dcdd3-203e-4725-88a3-06bfc6dd8235.png"
-                 alt="Project Reference"
-                 style="width:100%; height:auto; border-radius:8px; border:1px solid #27272a;" />
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    # PROJECT REFERENCE IMAGE — use the local path you supplied
+    local_ref_path = "/mnt/data/09d44fb9-da69-4d93-9bf9-55416baf68d0.png"
+    if os.path.exists(local_ref_path):
+        # Render using streamlit's native st.image (reliable)
+        st.markdown("<div style='display:flex; gap:12px; align-items:center;'>", unsafe_allow_html=True)
+        st.image(local_ref_path, caption="Project Reference", use_column_width=False, width=420)
+        st.markdown("</div>", unsafe_allow_html=True)
+    else:
+        st.warning(f"Project reference image not found at: {local_ref_path}")
 
     col_a, col_b = st.columns(2)
 
     with col_a:
-        # 1. Problem Statement
         st.markdown("""
         <div class="doc-section">
             <div class="doc-title">🎯 1. Problem Statement</div>
@@ -326,7 +436,6 @@ with t3:
         </div>
         """, unsafe_allow_html=True)
 
-        # 3. Methodology
         st.markdown("""
         <div class="doc-section">
             <div class="doc-title">🧠 3. Methodology</div>
@@ -349,7 +458,6 @@ with t3:
         </div>
         """, unsafe_allow_html=True)
 
-        # 5. Quantitative Results
         st.markdown("""
         <div class="doc-section">
             <div class="doc-title">🔮 5. Quantitative Results</div>
@@ -362,7 +470,6 @@ with t3:
         """, unsafe_allow_html=True)
 
     with col_b:
-        # 2. Dataset Info
         st.markdown("""
         <div class="doc-section">
             <div class="doc-title">💾 2. Dataset: FER2013</div>
@@ -377,7 +484,6 @@ with t3:
         </div>
         """, unsafe_allow_html=True)
 
-        # 4. Evaluation Metrics
         st.markdown("""
         <div class="doc-section">
             <div class="doc-title">📈 4. Evaluation Metrics</div>
@@ -393,7 +499,6 @@ with t3:
         </div>
         """, unsafe_allow_html=True)
 
-        # 6. AI as a Teammate
         st.markdown("""
         <div class="doc-section">
             <div class="doc-title">🤖 6. AI as a Teammate</div>
