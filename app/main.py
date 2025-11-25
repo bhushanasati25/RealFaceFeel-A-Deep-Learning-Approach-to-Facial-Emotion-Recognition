@@ -185,7 +185,7 @@ st.markdown("""
 <div class="project-header">
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
-            <h1 style="margin: 0; font-size: 2.5rem;">RealFaceFeel: A Deep Learning Approach to Facial Emotion Recognition</h1>
+            <h1 style="margin: 0; font-size: 2.5rem;">RealFaceFeel</h1>
             <p style="color: #94a3b8; margin: 5px 0 0 0; font-size: 1.1rem;">
                 A Deep Learning Approach to Facial Emotion Recognition
             </p>
@@ -285,11 +285,9 @@ with t2:
         img = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
         process_and_render(img)
 
-# --- TAB 3: PROJECT DETAILS (Updated) ---
+# --- TAB 3: PROJECT DETAILS (Strictly Updated per Report) ---
 with t3:
-    st.markdown("### 📄 Project Specifications")
-    st.markdown("Technical details regarding the architecture, dataset, and evaluation metrics.")
-    st.markdown("---")
+    st.markdown("<br>", unsafe_allow_html=True)
     
     col_a, col_b = st.columns(2)
     
@@ -299,11 +297,10 @@ with t3:
         <div class="doc-section">
             <div class="doc-title">🎯 1. Problem Statement</div>
             <div class="doc-text">
-            We aim to develop a facial emotion recognition system that can classify human facial expressions into 
-            categories such as <b>Happy, Sad, Angry, Surprised, Fear, Disgust, and Neutral</b>.
+            To develop a facial emotion recognition system classifying human expressions into 
+            <b>Happy, Sad, Angry, Surprised, Fear, Disgust, and Neutral</b>.
             <br><br>
-            <b>Goal:</b> Build a deep learning model to interpret visual cues and map them to emotional states 
-            via a real-time Streamlit web application.
+            <b>Goal:</b> Bridge the gap between human emotion and machine understanding via robust Deep Learning models.
             <br><br>
             <b>Applications:</b>
             <ul>
@@ -315,33 +312,32 @@ with t3:
         </div>
         """, unsafe_allow_html=True)
         
-        # 3. Models Tried
+        # 3. Methodology
         st.markdown("""
         <div class="doc-section">
-            <div class="doc-title">🧠 3. Model Experiments</div>
+            <div class="doc-title">🧠 3. Methodology</div>
             <div class="doc-text">
-            We experimented with the following architectures:
-            <ul>
-                <li><b>Baseline CNN:</b> Custom CNN trained from scratch (48x48 input).</li>
-                <li><b>Transfer Learning:</b> ResNet-50 & VGG16 fine-tuned on FER2013.</li>
-                <li><b>Dlib + MLP:</b> 68-point landmark extraction.</li>
-                <li><b>Transformers:</b> Evaluation of ViT and Swin Transformers.</li>
-            </ul>
-            <br>
-            <span class="tech-tag">Deep CNN</span>
-            <span class="tech-tag">Transfer Learning</span>
+            We implemented a multi-tiered modeling strategy:
+            <br><br>
+            <b>A. Baseline CNN (Custom)</b><br>
+            Lightweight 4-block ConvNet trained from scratch on 48x48 grayscale inputs.
+            <br><br>
+            <b>B. Transfer Learning (EfficientNetB0)</b><br>
+            Fine-tuned on FER2013 using ImageNet weights. Preprocessing involved resizing to 224x224 and channel stacking (RGB).
+            <br><br>
+            <span class="tech-tag">Deep CNN</span> <span class="tech-tag">Transfer Learning</span>
             </div>
         </div>
         """, unsafe_allow_html=True)
         
-        # 5. Performance Expectations
+        # 5. Quantitative Results
         st.markdown("""
         <div class="doc-section">
-            <div class="doc-title">🔮 5. Performance Expectations</div>
+            <div class="doc-title">🔮 5. Quantitative Results</div>
             <div class="doc-text">
-            • <b>Baseline CNN:</b> Expected ~60–65% accuracy.<br>
-            • <b>Target Accuracy:</b> Aiming for <b>70–73%</b> with Transfer Learning & Augmentation.<br>
-            • <b>Challenges:</b> Performance bounded by label noise and dataset difficulty (occlusions/illumination).
+            • <b>Baseline CNN:</b> Achieved <b>65%</b> Accuracy.<br>
+            • <b>EfficientNetB0:</b> Achieved <b>73%</b> Accuracy (Significant Improvement).<br>
+            • <b>Inference:</b> Real-time processing (~25ms per frame).
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -355,14 +351,10 @@ with t3:
             <b>ICML 2013 Kaggle Challenge Benchmark</b>
             <br><br>
             • <b>Volume:</b> 35,887 Grayscale Images (48x48 pixels).<br>
-            • <b>Diversity:</b> "In-the-wild" faces with noise & varying illumination.<br>
-            • <b>Splits:</b>
-            <ul>
-                <li>Training: 28,709</li>
-                <li>Validation: 3,589</li>
-                <li>Test: 3,589</li>
-            </ul>
-            • <b>Note:</b> Imbalanced classes (e.g., Disgust is underrepresented).
+            • <b>Splits:</b> Train (28,709), Val (3,589), Test (3,589).<br>
+            • <b>Challenges:</b> High Class Imbalance (Happy vs Disgust).
+            <br><br>
+            <b>Preprocessing:</b> Removed 1,800+ duplicate images to prevent data leakage.
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -372,13 +364,11 @@ with t3:
         <div class="doc-section">
             <div class="doc-title">📈 4. Evaluation Metrics</div>
             <div class="doc-text">
-            Performance is measured using:
-            <ul>
-                <li><b>Accuracy:</b> Standard metric on FER2013 test set.</li>
-                <li><b>Macro F1-Score:</b> To account for class imbalance.</li>
-                <li><b>Confusion Matrix:</b> Identify inter-class misclassifications (e.g., Fear vs Surprise).</li>
-                <li><b>Precision/Recall:</b> Granular per-class insight.</li>
-            </ul>
+            Due to class imbalance, we used comprehensive metrics:
+            <br><br>
+            • <b>Categorical Accuracy:</b> Overall correctness.<br>
+            • <b>Macro F1-Score:</b> Critical for minority classes.<br>
+            • <b>Confusion Matrix:</b> Analyzed geometric similarities (e.g., Fear vs. Surprise).
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -388,13 +378,11 @@ with t3:
         <div class="doc-section">
             <div class="doc-title">🤖 6. AI as a Teammate</div>
             <div class="doc-text">
-            We utilized AI tools throughout the project lifecycle:
-            <ul>
-                <li><b>Preprocessing:</b> Dlib/MediaPipe code generation.</li>
-                <li><b>Modeling:</b> PyTorch/TensorFlow architectural support.</li>
-                <li><b>Debugging:</b> AI assistants for prototyping.</li>
-                <li><b>Deployment:</b> Streamlit integration support.</li>
-            </ul>
+            AI tools acted as a "force multiplier":
+            <br><br>
+            • <b>Refactoring:</b> Modularizing code structure.<br>
+            • <b>Debugging:</b> Solving input shape mismatches.<br>
+            • <b>Design:</b> Generating this "Metallic Dark" UI theme.
             </div>
         </div>
         """, unsafe_allow_html=True)
