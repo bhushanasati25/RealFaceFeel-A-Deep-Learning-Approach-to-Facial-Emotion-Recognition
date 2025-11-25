@@ -174,7 +174,7 @@ with st.sidebar:
         st.error("MODEL OFFLINE")
 
     st.markdown("---")
-    st.caption("CS583 Final Project | RealFaceFeel v1.0")
+    st.caption("CS583 Final Project | RealFaceFeel: A Deep Learning Approach to Facial Emotion Recognition")
 
 # ========================================================
 # 5. MAIN CONTENT
@@ -185,7 +185,7 @@ st.markdown("""
 <div class="project-header">
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
-            <h1 style="margin: 0; font-size: 2.5rem;">RealFaceFeel</h1>
+            <h1 style="margin: 0; font-size: 2.5rem;">RealFaceFeel: A Deep Learning Approach to Facial Emotion Recognition</h1>
             <p style="color: #94a3b8; margin: 5px 0 0 0; font-size: 1.1rem;">
                 A Deep Learning Approach to Facial Emotion Recognition
             </p>
@@ -285,9 +285,11 @@ with t2:
         img = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
         process_and_render(img)
 
-# --- TAB 3: PROJECT DETAILS (Updated to match requested layout) ---
+# --- TAB 3: PROJECT DETAILS (Updated) ---
 with t3:
-    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("### 📄 Project Specifications")
+    st.markdown("Technical details regarding the architecture, dataset, and evaluation metrics.")
+    st.markdown("---")
     
     col_a, col_b = st.columns(2)
     
@@ -313,7 +315,7 @@ with t3:
         </div>
         """, unsafe_allow_html=True)
         
-        # 3. Model Experiments
+        # 3. Models Tried
         st.markdown("""
         <div class="doc-section">
             <div class="doc-title">🧠 3. Model Experiments</div>
