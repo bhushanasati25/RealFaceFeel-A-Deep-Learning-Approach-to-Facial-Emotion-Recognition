@@ -285,7 +285,7 @@ with t2:
         img = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
         process_and_render(img)
 
-# --- TAB 3: PROJECT DETAILS (Updated per screenshot) ---
+# --- TAB 3: PROJECT DETAILS (Updated to match requested layout) ---
 with t3:
     st.markdown("<br>", unsafe_allow_html=True)
     
@@ -319,13 +319,15 @@ with t3:
             <div class="doc-title">🧠 3. Model Experiments</div>
             <div class="doc-text">
             We experimented with the following architectures:
-            <br><br>
-            • <b>Baseline CNN:</b> Custom CNN trained from scratch (48x48 input).<br>
-            • <b>Transfer Learning:</b> ResNet-50 & VGG16 fine-tuned on FER2013.<br>
-            • <b>Dlib + MLP:</b> 68-point landmark extraction.<br>
-            • <b>Transformers:</b> Evaluation of ViT and Swin Transformers.
-            <br><br>
-            <span class="tech-tag">Deep CNN</span> <span class="tech-tag">Transfer Learning</span>
+            <ul>
+                <li><b>Baseline CNN:</b> Custom CNN trained from scratch (48x48 input).</li>
+                <li><b>Transfer Learning:</b> ResNet-50 & VGG16 fine-tuned on FER2013.</li>
+                <li><b>Dlib + MLP:</b> 68-point landmark extraction.</li>
+                <li><b>Transformers:</b> Evaluation of ViT and Swin Transformers.</li>
+            </ul>
+            <br>
+            <span class="tech-tag">Deep CNN</span>
+            <span class="tech-tag">Transfer Learning</span>
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -335,8 +337,8 @@ with t3:
         <div class="doc-section">
             <div class="doc-title">🔮 5. Performance Expectations</div>
             <div class="doc-text">
-            • <b>Baseline CNN:</b> Expected ~60-65% accuracy.<br>
-            • <b>Target Accuracy:</b> Aiming for <b>70-73%</b> with Transfer Learning & Augmentation.<br>
+            • <b>Baseline CNN:</b> Expected ~60–65% accuracy.<br>
+            • <b>Target Accuracy:</b> Aiming for <b>70–73%</b> with Transfer Learning & Augmentation.<br>
             • <b>Challenges:</b> Performance bounded by label noise and dataset difficulty (occlusions/illumination).
             </div>
         </div>
@@ -369,11 +371,12 @@ with t3:
             <div class="doc-title">📈 4. Evaluation Metrics</div>
             <div class="doc-text">
             Performance is measured using:
-            <br><br>
-            • <b>Accuracy:</b> Standard metric on FER2013 test set.<br>
-            • <b>Macro F1-Score:</b> To account for class imbalance.<br>
-            • <b>Confusion Matrix:</b> Identify inter-class misclassifications (e.g., Fear vs Surprise).<br>
-            • <b>Precision/Recall:</b> Granular per-class insight.
+            <ul>
+                <li><b>Accuracy:</b> Standard metric on FER2013 test set.</li>
+                <li><b>Macro F1-Score:</b> To account for class imbalance.</li>
+                <li><b>Confusion Matrix:</b> Identify inter-class misclassifications (e.g., Fear vs Surprise).</li>
+                <li><b>Precision/Recall:</b> Granular per-class insight.</li>
+            </ul>
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -384,11 +387,12 @@ with t3:
             <div class="doc-title">🤖 6. AI as a Teammate</div>
             <div class="doc-text">
             We utilized AI tools throughout the project lifecycle:
-            <br><br>
-            • <b>Preprocessing:</b> Dlib/MediaPipe code generation.<br>
-            • <b>Modeling:</b> PyTorch/TensorFlow architectural support.<br>
-            • <b>Debugging:</b> AI assistants for prototyping.<br>
-            • <b>Deployment:</b> Streamlit integration support.
+            <ul>
+                <li><b>Preprocessing:</b> Dlib/MediaPipe code generation.</li>
+                <li><b>Modeling:</b> PyTorch/TensorFlow architectural support.</li>
+                <li><b>Debugging:</b> AI assistants for prototyping.</li>
+                <li><b>Deployment:</b> Streamlit integration support.</li>
+            </ul>
             </div>
         </div>
         """, unsafe_allow_html=True)
