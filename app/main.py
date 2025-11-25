@@ -185,7 +185,7 @@ st.markdown("""
 <div class="project-header">
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
-            <h1 style="margin: 0; font-size: 2.5rem;">RealFaceFeel</h1>
+            <h1 style="margin: 0; font-size: 2.5rem;">RealFaceFeel: A Deep Learning Approach to Facial Emotion Recognition</h1>
             <p style="color: #94a3b8; margin: 5px 0 0 0; font-size: 1.1rem;">
                 A Deep Learning Approach to Facial Emotion Recognition
             </p>
@@ -285,12 +285,26 @@ with t2:
         img = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
         process_and_render(img)
 
-# --- TAB 3: PROJECT DETAILS (Strictly Updated per Report) ---
+# --- TAB 3: PROJECT DETAILS (Updated) ---
 with t3:
-    st.markdown("<br>", unsafe_allow_html=True)
-    
+    st.markdown("### 📄 Project Specifications")
+    st.markdown("Technical details regarding the architecture, dataset, and evaluation metrics.")
+    st.markdown("---")
+
+    # Reference image (local)
+    st.markdown(
+        f"""
+        <div style="margin-bottom: 1rem;">
+            <img src="/mnt/data/c12dcdd3-203e-4725-88a3-06bfc6dd8235.png"
+                 alt="Project Reference"
+                 style="width:100%; height:auto; border-radius:8px; border:1px solid #27272a;" />
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
     col_a, col_b = st.columns(2)
-    
+
     with col_a:
         # 1. Problem Statement
         st.markdown("""
@@ -300,18 +314,18 @@ with t3:
             To develop a facial emotion recognition system classifying human expressions into 
             <b>Happy, Sad, Angry, Surprised, Fear, Disgust, and Neutral</b>.
             <br><br>
-            <b>Goal:</b> Bridge the gap between human emotion and machine understanding via robust Deep Learning models.
+            <b>Goal:</b> Bridge the gap between human emotion and machine understanding via robust Deep Learning models and a real-time Streamlit UI.
             <br><br>
             <b>Applications:</b>
             <ul>
                 <li>Affective Computing</li>
-                <li>Human-Computer Interaction (HCI)</li>
+                <li>Human–Computer Interaction (HCI)</li>
                 <li>Mental Health Monitoring</li>
             </ul>
             </div>
         </div>
         """, unsafe_allow_html=True)
-        
+
         # 3. Methodology
         st.markdown("""
         <div class="doc-section">
@@ -320,24 +334,29 @@ with t3:
             We implemented a multi-tiered modeling strategy:
             <br><br>
             <b>A. Baseline CNN (Custom)</b><br>
-            Lightweight 4-block ConvNet trained from scratch on 48x48 grayscale inputs.
+            Lightweight 4-block ConvNet trained from scratch on 48×48 grayscale inputs.
             <br><br>
             <b>B. Transfer Learning (EfficientNetB0)</b><br>
-            Fine-tuned on FER2013 using ImageNet weights. Preprocessing involved resizing to 224x224 and channel stacking (RGB).
+            Fine-tuned on FER2013 using ImageNet weights. Preprocessing: resize to 224×224 and channel-stack grayscale to RGB where required.
             <br><br>
-            <span class="tech-tag">Deep CNN</span> <span class="tech-tag">Transfer Learning</span>
+            <b>C. Additional Experiments</b><br>
+            ResNet-50 & VGG16 (fine-tuning), Dlib 68-point landmarks + MLP, Vision Transformers (ViT / Swin).
+            <br><br>
+            <span class="tech-tag">Deep CNN</span>
+            <span class="tech-tag">Transfer Learning</span>
+            <span class="tech-tag">Data Augmentation</span>
             </div>
         </div>
         """, unsafe_allow_html=True)
-        
+
         # 5. Quantitative Results
         st.markdown("""
         <div class="doc-section">
             <div class="doc-title">🔮 5. Quantitative Results</div>
             <div class="doc-text">
-            • <b>Baseline CNN:</b> Achieved <b>65%</b> Accuracy.<br>
-            • <b>EfficientNetB0:</b> Achieved <b>73%</b> Accuracy (Significant Improvement).<br>
-            • <b>Inference:</b> Real-time processing (~25ms per frame).
+            • <b>Baseline CNN:</b> Achieved ~65% accuracy on FER2013.<br>
+            • <b>EfficientNetB0 (Fine-tuned):</b> Achieved ~73% accuracy (significant improvement).<br>
+            • <b>Inference:</b> Real-time capable (~25 ms per frame on target hardware).
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -348,13 +367,12 @@ with t3:
         <div class="doc-section">
             <div class="doc-title">💾 2. Dataset: FER2013</div>
             <div class="doc-text">
-            <b>ICML 2013 Kaggle Challenge Benchmark</b>
+            <b>ICML 2013 / Kaggle Benchmark</b>
             <br><br>
-            • <b>Volume:</b> 35,887 Grayscale Images (48x48 pixels).<br>
+            • <b>Volume:</b> 35,887 grayscale images (48×48 px).<br>
             • <b>Splits:</b> Train (28,709), Val (3,589), Test (3,589).<br>
-            • <b>Challenges:</b> High Class Imbalance (Happy vs Disgust).
-            <br><br>
-            <b>Preprocessing:</b> Removed 1,800+ duplicate images to prevent data leakage.
+            • <b>Challenges:</b> In-the-wild faces, occlusion, varying illumination, and class imbalance (e.g., Disgust).<br>
+            • <b>Preprocessing:</b> Removed 1,800+ duplicate images to prevent leakage; face detection → crop → normalize; augmentation (flip, shift, brightness).
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -365,24 +383,28 @@ with t3:
             <div class="doc-title">📈 4. Evaluation Metrics</div>
             <div class="doc-text">
             Due to class imbalance, we used comprehensive metrics:
-            <br><br>
-            • <b>Categorical Accuracy:</b> Overall correctness.<br>
-            • <b>Macro F1-Score:</b> Critical for minority classes.<br>
-            • <b>Confusion Matrix:</b> Analyzed geometric similarities (e.g., Fear vs. Surprise).
+            <ul>
+                <li><b>Categorical Accuracy:</b> Overall correctness.</li>
+                <li><b>Macro F1-Score:</b> Critical for minority classes.</li>
+                <li><b>Confusion Matrix:</b> Analyze inter-class errors (e.g., Fear vs Surprise).</li>
+                <li><b>Precision / Recall:</b> Per-class performance details.</li>
+            </ul>
             </div>
         </div>
         """, unsafe_allow_html=True)
-        
-        # 6. AI Collaboration
+
+        # 6. AI as a Teammate
         st.markdown("""
         <div class="doc-section">
             <div class="doc-title">🤖 6. AI as a Teammate</div>
             <div class="doc-text">
-            AI tools acted as a "force multiplier":
-            <br><br>
-            • <b>Refactoring:</b> Modularizing code structure.<br>
-            • <b>Debugging:</b> Solving input shape mismatches.<br>
-            • <b>Design:</b> Generating this "Metallic Dark" UI theme.
+            AI tools acted as a \"force multiplier\" across the project:
+            <ul>
+                <li><b>Refactoring:</b> Modularized code for training, inference, and deployment.</li>
+                <li><b>Debugging:</b> Resolved input-shape mismatches and preprocessing bugs.</li>
+                <li><b>Design:</b> Generated the Metallic Dark UI theme and CSS.</li>
+                <li><b>Prototyping:</b> Rapid iteration for model architectures and scripts.</li>
+            </ul>
             </div>
         </div>
         """, unsafe_allow_html=True)
